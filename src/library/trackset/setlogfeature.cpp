@@ -16,6 +16,7 @@
 #include "mixer/playermanager.h"
 #include "moc_setlogfeature.cpp"
 #include "track/track.h"
+#include "util/cmdlineargs.h"
 #include "util/make_const_iterator.h"
 #include "widget/wlibrary.h"
 #include "widget/wlibrarysidebar.h"
@@ -97,6 +98,8 @@ SetlogFeature::SetlogFeature(
 
     // initialized in a new generic slot(get new history playlist purpose)
     slotGetNewPlaylist();
+
+    addPlaylistIfCmdArg();
 }
 
 SetlogFeature::~SetlogFeature() {
@@ -104,6 +107,46 @@ SetlogFeature::~SetlogFeature() {
     // incl. the empty placeholder playlist and potentially empty current playlist
     deleteAllUnlockedPlaylistsWithFewerTracks();
 }
+
+
+void SetlogFeature::addPlaylistIfCmdArg() {
+    const QString playlistFile = CmdlineArgs::Instance().getPlaylistFilePath();
+    if(!playlistFile.isNull()) {
+        int lastPlaylistId = kInvalidPlaylistId;
+
+        const QFileInfo fileInfo(playlistFile);
+        // Get a valid name
+        const QString baseName = fileInfo.baseName();
+        QString name;
+
+        bool validNameGiven = false;
+        int i = 0;
+        while (!validNameGiven) {
+            name = baseName;
+            if (i != 0) {
+                name += QString::number(i);
+            }
+
+            // Check name
+            int existingId = m_playlistDao.getPlaylistIdFromName(name);
+
+            validNameGiven = (existingId == kInvalidPlaylistId);
+            ++i;
+        }
+
+        lastPlaylistId = m_playlistDao.createPlaylist(name);
+        if (lastPlaylistId == kInvalidPlaylistId) {
+            QMessageBox::warning(nullptr,
+                    tr("Playlist Creation Failed"),
+                    tr("An unknown error occurred while creating playlist: ") + name);
+            return;
+        }
+
+        BasePlaylistFeature::slotImportPlaylistFile(playlistFile, lastPlaylistId);
+        BasePlaylistFeature::activatePlaylist(lastPlaylistId);
+    }
+}
+
 
 QVariant SetlogFeature::title() {
     return tr("History");
