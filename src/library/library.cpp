@@ -706,3 +706,34 @@ LibraryTableModel* Library::trackTableModel() const {
 
     return m_pMixxxLibraryFeature->trackTableModel();
 }
+
+void Library::importPlaylistFromFile(QString playlistFile) {
+    if (!playlistFile.isNull()) {
+        PlaylistDAO& playlistDao = m_pTrackCollectionManager->internalCollection()
+                                           ->getPlaylistDAO();
+
+        int lastPlaylistId = kInvalidPlaylistId;
+
+        const QFileInfo fileInfo(playlistFile);
+        const QString baseName = fileInfo.baseName();
+        QString name = baseName;
+        // Check if there already is a playlist by that name. If yes, add
+        // increasing suffix (1++) until we find an unused name.
+        int i = 1;
+        while (m_playlistDao.getPlaylistIdFromName(name) != kInvalidPlaylistId) {
+            name = baseName + QChar(' ') + QString::number(i);
+            ++i;
+        }
+
+        lastPlaylistId = playlistDao.createPlaylist(name);
+        if (lastPlaylistId == kInvalidPlaylistId) {
+            QMessageBox::warning(nullptr,
+                    tr("Playlist Creation Failed"),
+                    tr("An unknown error occurred while creating playlist: ") + name);
+            return;
+        }
+
+        m_pPlaylistFeature->slotImportPlaylistFile(playlistFile, lastPlaylistId);
+        // m_pPlaylistFeature->activatePlaylist(lastPlaylistId); //TODO: fix this
+    }
+}

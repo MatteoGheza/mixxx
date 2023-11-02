@@ -444,6 +444,9 @@ void CoreServices::initialize(QApplication* pApp) {
         }
     }
 
+    const QString playlistFile = m_cmdlineArgs.getPlaylistFilePath();
+    getLibrary()->importPlaylistFromFile(playlistFile);
+
     m_isInitialized = true;
 }
 

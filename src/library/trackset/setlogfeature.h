@@ -50,7 +50,6 @@ class SetlogFeature : public BasePlaylistFeature {
   private:
     void deleteAllUnlockedPlaylistsWithFewerTracks();
     void lockOrUnlockAllChildPlaylists(bool lock);
-    void addPlaylistIfCmdArg();
     QString getRootViewHtml() const override;
 
     std::list<TrackId> m_recentTracks;
