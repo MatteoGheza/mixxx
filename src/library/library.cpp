@@ -708,9 +708,8 @@ LibraryTableModel* Library::trackTableModel() const {
 }
 
 void Library::importPlaylistFromFile(QString playlistFile) {
-    int playlistId;
-    if (!playlistFile.isNull()) {
-        playlistId = m_pPlaylistFeature->createImportPlaylist(playlistFile);
+    if (!playlistFile.isEmpty()) {
+        int playlistId = m_pPlaylistFeature->createImportPlaylist(playlistFile);
         if (playlistId == kInvalidPlaylistId)
             return;
         m_pPlaylistFeature->activatePlaylist(playlistId);
