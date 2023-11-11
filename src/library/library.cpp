@@ -707,11 +707,16 @@ LibraryTableModel* Library::trackTableModel() const {
     return m_pMixxxLibraryFeature->trackTableModel();
 }
 
-void Library::importPlaylistFromFile(const QString& playlistFile) {
+void Library::importPlaylistFromFile(const QString& playlistFile, bool activatePlaylist = true, bool sendToAutoDJ = false, PlaylistDAO::AutoDJSendLoc loc = PlaylistDAO::AutoDJSendLoc::TOP) {
     if (!playlistFile.isEmpty()) {
         int playlistId = m_pPlaylistFeature->createImportPlaylist(playlistFile);
         if (playlistId == kInvalidPlaylistId)
             return;
-        m_pPlaylistFeature->activatePlaylist(playlistId);
+        
+        if (activatePlaylist) 
+            m_pPlaylistFeature->activatePlaylist(playlistId);
+        
+        if (sendToAutoDJ)
+            
     }
 }

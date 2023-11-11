@@ -90,6 +90,9 @@ class CmdlineArgs final {
     bool m_qml;
 #endif
     bool m_safeMode;
+    bool m_autodjReplace;
+    bool m_autodjAddTop;
+    bool m_autodjAddBottom;
     bool m_useLegacyVuMeter;
     bool m_useLegacySpinny;
     bool m_debugAssertBreak;
